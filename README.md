@@ -46,8 +46,6 @@ Access the application at http://localhost:8080
 ### Adding New Database Models
 
 ```bash
-### Adding new database models
-```bash
 go run -mod=mod entgo.io/ent/cmd/ent new ModelInCamelCase
 ```
 

@@ -1,0 +1,14 @@
+version: "3"  # optional since v1.27.0
+services:
+  mailhog:
+    platform: linux/x86_64
+    image: mailhog/mailhog:v1.0.1
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+    environment:
+      - MH_STORAGE=maildir
+    volumes:
+      - mail:/maildir
+volumes:
+  mail:

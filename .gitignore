@@ -19,3 +19,12 @@
 
 # Go workspace file
 go.work
+
+# Ignore IDE
+.idea/
+
+# Ignore local sqlite
+local/data/go-monolith-template.db
+
+# Ignore air builds
+tmp/

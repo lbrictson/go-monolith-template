@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"go-monolith-template/ent/session"
 	"go-monolith-template/ent/user"
 	"reflect"
 	"sync"
@@ -73,7 +74,8 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			user.Table: user.ValidColumn,
+			session.Table: session.ValidColumn,
+			user.Table:    user.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

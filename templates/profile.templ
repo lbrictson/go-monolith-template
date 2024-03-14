@@ -1,0 +1,88 @@
+package templates
+
+import "go-monolith-template/pkg/models"
+
+templ ProfilePage(user models.User, isAdmin bool) {
+@Navbar("dashboard", user.Email, isAdmin)
+<div class="row">
+    <div class="col-md-4"></div>
+    <div class="col-md-4">
+        <div class="card shadow-lg">
+        <div class="card-body">
+            <h4 class="text-center" style="text-decoration: underline;">Settings</h4>
+            <br/>
+            <form class="row row-cols-lg-auto g-3 align-items-center">
+              <div class="col-12">
+                <label class="visually-hidden" for="inlineFormInputGroupUsername">Email</label>
+                <div class="input-group">
+                  <div class="input-group-text">Email</div>
+                  <input type="text" name="email" class="form-control" disabled value={user.Email} />
+                </div>
+              </div>
+            </form>
+            <br />
+            <form class="row row-cols-lg-auto g-3 align-items-center" action="/profile/password" method="post">
+              <div class="col-12">
+                <label class="visually-hidden" for="inlineFormInputGroupUsername">Password</label>
+                <div class="input-group">
+                  <div class="input-group-text">New Password</div>
+                  <input type="password" name="password" class="form-control" />
+                </div>
+              </div>
+              <div class="col-12">
+                <button type="submit" class="btn btn-secondary">Change</button>
+              </div>
+            </form>
+            <br />
+            <h4 class="text-center" style="text-decoration: underline;">Advanced Security</h4>
+            if user.MFAEnabled {
+            <form class="row row-cols-lg-auto g-3 d-flex align-items-center justify-content-center">
+              <div class="col-12">
+                <button type="button" class="btn btn-secondary"
+                hx-delete="/profile/disable_mfa" hx-confirm="Are you sure you want to disable MFA?">Disable Multifactor Authentication</button>
+              </div>
+            </form>
+            } else {
+            <form class="row row-cols-lg-auto g-3 d-flex align-items-center justify-content-center">
+              <div class="col-12">
+                <a href="/profile/enable_mfa" class="btn btn-secondary">Enable Multifactor Authentication</a>
+              </div>
+            </form>
+            }
+        </div>
+        </div>
+    </div>
+    <div class="col-md-4"></div>
+</div>
+}
+
+templ PageEnableMFA(user models.User, isAdmin bool, qrCode string, mfaSecret string) {
+    @Navbar("profile", user.Email, isAdmin)
+    <div class="row">
+
+    <div class="col-md-4"></div>
+    <div class="col-md-4 d-flex align-items-center justify-content-center">
+        <div class="card shadow-lg">
+        <div class="card-body">
+            <h4 class="text-center" style="text-decoration: underline;">Enable Multifactor Authentication</h4>
+            <br/>
+              <img class="img-thumbnail" alt="QR Code" src={qrCode} />
+              <p>Scan the QR code with your authenticator app</p>
+                <p>Or enter the code manually: {mfaSecret}</p>
+              <form class="row row-cols-lg-auto g-3 align-items-center" action="/profile/enable_mfa" method="post">
+              <div class="col-12">
+                <label class="visually-hidden" for="inlineFormInputGroupUsername">Enter Code</label>
+                <div class="input-group">
+                  <div class="input-group-text">Enter Code</div>
+                  <input type="text" name="token" class="form-control"  required />
+                </div>
+              </div>
+              <div class="col-12">
+                <button type="submit" class="btn btn-secondary">Enable</button>
+              </div>
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+}

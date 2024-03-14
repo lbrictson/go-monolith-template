@@ -36,5 +36,9 @@ func New() *slog.Logger {
 }
 
 func FromEchoContext(ctx echo.Context) *slog.Logger {
-	return FromContext(ctx.Request().Context())
+	l := ctx.Get("logger")
+	if l == nil {
+		return New()
+	}
+	return l.(*slog.Logger)
 }

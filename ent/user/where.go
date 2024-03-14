@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/google/uuid"
 )
 
@@ -648,6 +649,29 @@ func RoleEqualFold(v string) predicate.User {
 // RoleContainsFold applies the ContainsFold predicate on the "role" field.
 func RoleContainsFold(v string) predicate.User {
 	return predicate.User(sql.FieldContainsFold(FieldRole, v))
+}
+
+// HasUserSession applies the HasEdge predicate on the "user_session" edge.
+func HasUserSession() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, UserSessionTable, UserSessionColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasUserSessionWith applies the HasEdge predicate on the "user_session" edge with a given conditions (other predicates).
+func HasUserSessionWith(preds ...predicate.Session) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := newUserSessionStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

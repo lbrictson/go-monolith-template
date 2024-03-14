@@ -10,7 +10,7 @@ import "context"
 import "io"
 import "bytes"
 
-func DashboardPage() templ.Component {
+func DashboardPage(email string, isAdmin bool) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {
@@ -23,7 +23,11 @@ func DashboardPage() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div><h1>Dashboard</h1></div>")
+		templ_7745c5c3_Err = Navbar("dashboard", email, isAdmin).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"container\"><div class=\"row\"><div class=\"col-3\"><div class=\"card shadow-lg\"><div class=\"card-body\"><div class=\"row\"><div class=\"col-10\"><h6 class=\"card-title\">Coffee Cups Consumed</h6><h4 class=\"card-text\">2031 cups</h4></div><div class=\"col-2\"><h2><i class=\"bi bi-cup-hot\"></i></h2></div></div><p style=\"padding-top: 1rem !important;\"><i class=\"bi bi-arrow-up\"></i> 22% over last month</p><a href=\"#\" class=\"btn btn-sm btn-secondary float-end\">Details</a></div></div></div><div class=\"col-3\"><div class=\"card shadow-lg\"><div class=\"card-body\"><div class=\"row\"><div class=\"col-10\"><h6 class=\"card-title\">Bugs Created</h6><h4 class=\"card-text\">4 bugs</h4></div><div class=\"col-2\"><h2><i class=\"bi bi-bug\"></i></h2></div></div><p style=\"padding-top: 1rem !important;\"><i class=\"bi bi-arrow-down\"></i> 1 less than last month</p><a href=\"#\" class=\"btn btn-sm btn-secondary float-end\">Details</a></div></div></div><div class=\"col-3\"><div class=\"card shadow-lg\"><div class=\"card-body\"><div class=\"row\"><div class=\"col-10\"><h6 class=\"card-title\">Time Spent in Meetings</h6><h4 class=\"card-text\">398 minutes</h4></div><div class=\"col-2\"><h2><i class=\"bi bi-people\"></i></h2></div></div><p style=\"padding-top: 1rem !important;\"><i class=\"bi bi-arrow-up\"></i> 6% up over last month</p><a href=\"#\" class=\"btn btn-sm btn-secondary float-end\">Details</a></div></div></div><div class=\"col-3\"><div class=\"card shadow-lg\"><div class=\"card-body\"><div class=\"row\"><div class=\"col-10\"><h6 class=\"card-title\">Time Spent Coding</h6><h4 class=\"card-text\">120 minutes</h4></div><div class=\"col-2\"><h2><i class=\"bi bi-code\"></i></h2></div></div><p style=\"padding-top: 1rem !important;\"><i class=\"bi bi-arrow-down\"></i> 2% down over last month</p><a href=\"#\" class=\"btn btn-sm btn-secondary float-end\">Details</a></div></div></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

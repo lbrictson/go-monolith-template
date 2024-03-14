@@ -36,7 +36,7 @@ func Page(title string, content templ.Component, additionalStyleSheets templ.Com
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</title><!-- Bootstrap core CSS --><link href=\"/static/css/bootstrap.min.css\" rel=\"stylesheet\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</title><!-- Bootstrap core CSS --><link href=\"/static/css/bootstrap.min.css\" rel=\"stylesheet\"><link rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -46,7 +46,7 @@ func Page(title string, content templ.Component, additionalStyleSheets templ.Com
 				return templ_7745c5c3_Err
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!-- Favicons --></head><body class=\"text-center\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!-- Favicons --></head><body>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -54,7 +54,7 @@ func Page(title string, content templ.Component, additionalStyleSheets templ.Com
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</body><script src=\"/static/js/bootstrap.min.js\"></script>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</body><script src=\"https://unpkg.com/htmx.org@1.9.10\" integrity=\"sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC\" crossorigin=\"anonymous\"></script><script src=\"/static/js/bootstrap.min.js\"></script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

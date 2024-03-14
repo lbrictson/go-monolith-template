@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/google/uuid"
 )
 
@@ -38,8 +39,17 @@ const (
 	FieldAPIKey = "api_key"
 	// FieldRole holds the string denoting the role field in the database.
 	FieldRole = "role"
+	// EdgeUserSession holds the string denoting the user_session edge name in mutations.
+	EdgeUserSession = "user_session"
 	// Table holds the table name of the user in the database.
 	Table = "users"
+	// UserSessionTable is the table that holds the user_session relation/edge.
+	UserSessionTable = "sessions"
+	// UserSessionInverseTable is the table name for the Session entity.
+	// It exists in this package in order to avoid circular dependency with the "session" package.
+	UserSessionInverseTable = "sessions"
+	// UserSessionColumn is the table column denoting the user_session relation/edge.
+	UserSessionColumn = "user_user_session"
 )
 
 // Columns holds all SQL columns for user fields.
@@ -156,4 +166,25 @@ func ByAPIKey(opts ...sql.OrderTermOption) OrderOption {
 // ByRole orders the results by the role field.
 func ByRole(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldRole, opts...).ToFunc()
+}
+
+// ByUserSessionCount orders the results by user_session count.
+func ByUserSessionCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newUserSessionStep(), opts...)
+	}
+}
+
+// ByUserSession orders the results by user_session terms.
+func ByUserSession(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newUserSessionStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newUserSessionStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(UserSessionInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, UserSessionTable, UserSessionColumn),
+	)
 }

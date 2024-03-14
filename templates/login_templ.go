@@ -23,7 +23,39 @@ func LoginPage() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div><h1>Login</h1><form><input type=\"text\" placeholder=\"Username\"> <input type=\"password\" placeholder=\"Password\"> <button type=\"submit\">Login</button></form></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"row\"><div class=\"col-md-4\"></div><div class=\"col-md-4\" style=\"padding-top: 8rem;\"><div class=\"card shadow-lg\"><div class=\"card-body\"><h3 class=\"text-center\">Application Name</h3><hr><form class=\"form\" action=\"/login\" method=\"post\"><div class=\"mb-3\"><input class=\"form-control\" type=\"email\" name=\"email\" required placeholder=\"Email\"></div><div class=\"mb-3\"><input class=\"form-control\" type=\"password\" name=\"password\" required placeholder=\"Password\"></div><div class=\"d-grid gap-2\"><button class=\"btn btn-secondary\" type=\"submit\">Login</button></div></form><hr><p>Forgot your password? <a href=\"/forgot-password\">Reset it</a></p></div></div></div><div class=\"col-md-4\"></div></div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if !templ_7745c5c3_IsBuffer {
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteTo(templ_7745c5c3_W)
+		}
+		return templ_7745c5c3_Err
+	})
+}
+
+func MFAPage(email string) templ.Component {
+	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
+		if !templ_7745c5c3_IsBuffer {
+			templ_7745c5c3_Buffer = templ.GetBuffer()
+			defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var2 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var2 == nil {
+			templ_7745c5c3_Var2 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"row\"><div class=\"col-md-4\"></div><div class=\"col-md-4\" style=\"padding-top: 8rem;\"><div class=\"card shadow-lg\"><div class=\"card-body\"><h3 class=\"text-center\">Multifactor Authentication</h3><hr><form class=\"form\" action=\"/mfa\" method=\"post\" autocomplete=\"off\"><div class=\"mb-3\"><input class=\"form-control\" type=\"email\" name=\"email\" hidden value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(email))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"></div><div class=\"mb-3\"><input class=\"form-control\" type=\"text\" name=\"token\" required placeholder=\"Code\"></div><div class=\"d-grid gap-2\"><button class=\"btn btn-secondary\" type=\"submit\">Submit</button></div></form></div></div></div><div class=\"col-md-4\"></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

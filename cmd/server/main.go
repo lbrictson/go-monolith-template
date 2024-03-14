@@ -5,14 +5,18 @@ import (
 	"fmt"
 	"go-monolith-template/pkg/config"
 	"go-monolith-template/pkg/core"
+	"go-monolith-template/pkg/http_middleware"
 	"go-monolith-template/pkg/logging"
 	"go-monolith-template/pkg/models"
 	"go-monolith-template/pkg/password_handling"
 	"go-monolith-template/pkg/server"
+	"go-monolith-template/pkg/session_handling"
 	"go-monolith-template/pkg/store"
 	"log/slog"
 	_ "modernc.org/sqlite"
+	"net/http"
 	"strings"
+	"time"
 )
 
 func main() {
@@ -35,11 +39,24 @@ func main() {
 		MFAMandatory:             parsedConfig.Security.EnforceMFA,
 		LockoutDurationMinutes:   parsedConfig.Security.FailedLoginLockoutTimeMinutes,
 	})
-
+	sessionHandler := session_handling.NewSessionManager(
+		session_handling.NewSessionManagerOptions{
+			MaxSessionAgeSeconds:   parsedConfig.Security.MaxSessionAgeSeconds,
+			CookieName:             parsedConfig.Security.CookieName,
+			CookieSecret:           parsedConfig.Security.CookieSecret,
+			DefaultCacheExpiration: 30 * time.Second,
+			SameSite:               http.SameSiteLaxMode,
+			Secure:                 parsedConfig.Security.SecureCookie,
+			HTTPOnly:               parsedConfig.Security.HTTPOnlyCookie,
+			StorageLayer:           storageLayer,
+		})
+	middle := http_middleware.NewMiddleware(sessionHandler)
 	s := server.NewServer(server.NewServerOptions{
 		Port:                  parsedConfig.Server.Port,
 		StorageLayer:          storageLayer,
 		UserManagementService: userMgt,
+		Middleware:            middle,
+		SessionHandler:        sessionHandler,
 	})
 	defer storageLayer.Close()
 	s.Run()

@@ -41,8 +41,29 @@ type User struct {
 	// APIKey holds the value of the "api_key" field.
 	APIKey string `json:"api_key,omitempty"`
 	// Role holds the value of the "role" field.
-	Role         string `json:"role,omitempty"`
+	Role string `json:"role,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the UserQuery when eager-loading is set.
+	Edges        UserEdges `json:"edges"`
 	selectValues sql.SelectValues
+}
+
+// UserEdges holds the relations/edges for other nodes in the graph.
+type UserEdges struct {
+	// UserSession holds the value of the user_session edge.
+	UserSession []*Session `json:"user_session,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// UserSessionOrErr returns the UserSession value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) UserSessionOrErr() ([]*Session, error) {
+	if e.loadedTypes[0] {
+		return e.UserSession, nil
+	}
+	return nil, &NotLoadedError{edge: "user_session"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -162,6 +183,11 @@ func (u *User) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (u *User) Value(name string) (ent.Value, error) {
 	return u.selectValues.Get(name)
+}
+
+// QueryUserSession queries the "user_session" edge of the User entity.
+func (u *User) QueryUserSession() *SessionQuery {
+	return NewUserClient(u.config).QueryUserSession(u)
 }
 
 // Update returns a builder for updating this User.

@@ -25,3 +25,13 @@ type User struct {
 	UpdatedAt    time.Time  `json:"updated_at"`
 	Role         string     `json:"role"`
 }
+
+type SessionData struct {
+	ID           uuid.UUID `json:"id"`
+	UserID       uuid.UUID `json:"user_id"`
+	Email        string    `json:"email"`
+	Role         string    `json:"role"`
+	MFAEnabled   bool      `json:"mfa_enabled"`
+	MFACompleted bool      `json:"mfa_completed"`
+	CreatedAt    time.Time `json:"created_at"`
+}

@@ -1,12 +1,55 @@
 package templates
 
 templ LoginPage() {
-    <div>
-        <h1>Login</h1>
-        <form>
-        <input type="text" placeholder="Username" />
-        <input type="password" placeholder="Password" />
-        <button type="submit">Login</button>
-        </form>
+<div class="row">
+    <div class="col-md-4"></div>
+    <div class="col-md-4" style="padding-top: 8rem;">
+        <div class="card shadow-lg">
+        <div class="card-body">
+            <h3 class="text-center">Application Name</h3>
+            <hr />
+            <form class="form" action="/login" method="post">
+            <div class="mb-3">
+            <input class="form-control" type="email" name="email" required placeholder="Email" />
+            </div>
+            <div class="mb-3">
+            <input class="form-control" type="password" name="password" required placeholder="Password" />
+            </div>
+            <div class="d-grid gap-2">
+              <button class="btn btn-secondary" type="submit">Login</button>
+            </div>
+            </form>
+            <hr />
+            <p>Forgot your password? <a href="/forgot-password">Reset it</a></p>
+        </div>
+        </div>
     </div>
+    <div class="col-md-4"></div>
+</div>
+}
+
+templ MFAPage(email string) {
+<div class="row">
+    <div class="col-md-4"></div>
+    <div class="col-md-4" style="padding-top: 8rem;">
+        <div class="card shadow-lg">
+        <div class="card-body">
+            <h3 class="text-center">Multifactor Authentication</h3>
+            <hr />
+            <form class="form" action="/mfa" method="post" autocomplete="off">
+            <div class="mb-3">
+            <input class="form-control" type="email" name="email" hidden value={email} />
+            </div>
+            <div class="mb-3">
+            <input class="form-control" type="text" name="token" required placeholder="Code" />
+            </div>
+            <div class="d-grid gap-2">
+              <button class="btn btn-secondary" type="submit">Submit</button>
+            </div>
+            </form>
+        </div>
+        </div>
+    </div>
+    <div class="col-md-4"></div>
+</div>
 }

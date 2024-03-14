@@ -29,7 +29,7 @@ func ConnectSQLITE3(opts SqliteAdapterOptions, migrate bool) (*ent.Client, error
 		}
 		return client, nil
 	}
-	dbConn, err := sql.Open("sqlite3", fmt.Sprintf("%v.db?_fk=1&mode=rwc&cache=shared&_journal_mode=WAL", opts.FileName))
+	dbConn, err := sql.Open("sqlite3", fmt.Sprintf("%v?_fk=1&mode=rwc&cache=shared&_journal_mode=WAL", opts.FileName))
 	if err != nil {
 		return nil, fmt.Errorf("failed opening connection to sqlite: %v", err)
 	}

@@ -16,6 +16,8 @@ test:
 	@echo "Running tests..."
 	@go test -v -cover ./pkg/...
 	@rm -f local/test_dbs/*.db
+	@rm -f local/test_dbs/*-shm
+	@rm -f local/test_dbs/*-wal
 
 .PHONY: run
 run:

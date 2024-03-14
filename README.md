@@ -11,13 +11,15 @@ implementation, however postgres is fully supported in the configuration file.
 - [x] Makefile for common tasks
 - [x] Ent for database schema and automatic migrations
 - [x] Mailhog for email testing
-- [ ] Multifactor authentication (TOTP)
-- [ ] Authentication middleware
-- [ ] Templ for html templating
+- [x] Multifactor authentication (TOTP)
+- [x] Authentication middleware
+- [x] Templ for html templating
 - [x] Slog for structured logging
 - [x] Hot reload with Air
 - [x] GitHub Actions testing
 - [x] Environment variables for configuration
+- [ ] User management view
+- [ ] Forgot password flow
 
 ## Required Tools
 

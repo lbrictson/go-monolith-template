@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"go-monolith-template/ent/session"
 	"go-monolith-template/ent/user"
 	"time"
 
@@ -177,6 +178,21 @@ func (uc *UserCreate) SetNillableID(u *uuid.UUID) *UserCreate {
 		uc.SetID(*u)
 	}
 	return uc
+}
+
+// AddUserSessionIDs adds the "user_session" edge to the Session entity by IDs.
+func (uc *UserCreate) AddUserSessionIDs(ids ...uuid.UUID) *UserCreate {
+	uc.mutation.AddUserSessionIDs(ids...)
+	return uc
+}
+
+// AddUserSession adds the "user_session" edges to the Session entity.
+func (uc *UserCreate) AddUserSession(s ...*Session) *UserCreate {
+	ids := make([]uuid.UUID, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return uc.AddUserSessionIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -362,6 +378,22 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	if value, ok := uc.mutation.Role(); ok {
 		_spec.SetField(user.FieldRole, field.TypeString, value)
 		_node.Role = value
+	}
+	if nodes := uc.mutation.UserSessionIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserSessionTable,
+			Columns: []string{user.UserSessionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(session.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

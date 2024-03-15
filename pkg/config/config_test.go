@@ -43,7 +43,7 @@ func TestRead(t *testing.T) {
 			FailedLoginLockout:            true,
 			FailedLoginLockoutTimeMinutes: 5,
 			FailedLoginLockoutAttempts:    5,
-			MaxSessionAgeSeconds:          3600,
+			MaxSessionAgeSeconds:          86400,
 		},
 		Logging: Logging{
 			Level: "info",

@@ -3,7 +3,6 @@ package core
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/pquerna/otp/totp"
 	"go-monolith-template/pkg/logging"
 	"go-monolith-template/pkg/models"
@@ -55,11 +54,8 @@ func (u *UserService) AuthenticateUser(ctx context.Context, email string, passwo
 		return false, false, errors.New("Invalid username or password")
 	}
 	if user.Locked {
-		fmt.Println("user was locked")
-		fmt.Println(user.LockedAt)
 		// If the lockout time has passed, unlock the user
 		if !user.LockedAt.Add(time.Duration(u.lockoutDurationMinutes) * time.Minute).Before(time.Now()) {
-			fmt.Println("unlocking user")
 			f := false
 			_, err := u.dbConn.UserUpdate(ctx, user.ID, store.UpdateUserOptions{
 				Locked:        &f,

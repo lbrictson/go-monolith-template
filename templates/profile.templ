@@ -66,7 +66,10 @@ templ PageEnableMFA(user models.User, isAdmin bool, qrCode string, mfaSecret str
         <div class="card-body">
             <h4 class="text-center" style="text-decoration: underline;">Enable Multifactor Authentication</h4>
             <br/>
+            <div class="text-center">
               <img class="img-thumbnail" alt="QR Code" src={qrCode} />
+              </div>
+              <br/>
               <p>Scan the QR code with your authenticator app</p>
                 <p>Or enter the code manually: {mfaSecret}</p>
               <form class="row row-cols-lg-auto g-3 align-items-center" action="/profile/enable_mfa" method="post">

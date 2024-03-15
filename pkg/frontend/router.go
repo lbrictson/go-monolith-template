@@ -39,5 +39,7 @@ func LoadFrontendRoutes(e *echo.Echo, options LoadFrontendViewOptions) {
 	e.POST("/profile/enable_mfa", formSubmitEnableMFA(options.UserManagementService), options.MiddlewareManager.LoginRequired)
 	e.DELETE("/profile/disable_mfa", hookDisableMFA(options.UserManagementService), options.MiddlewareManager.LoginRequired)
 	e.POST("/profile/password", formSubmitUpdatePassword(options.UserManagementService), options.MiddlewareManager.LoginRequired)
+	// Admin - Team handlers
+	e.GET("/admin/team", viewTeam(options.UserManagementService), options.MiddlewareManager.LoginRequired, options.MiddlewareManager.AdminRequired)
 	return
 }

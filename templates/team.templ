@@ -1,0 +1,20 @@
+package templates
+
+import "go-monolith-template/pkg/models"
+
+templ PageAdminTeam(user models.User, isAdmin bool) {
+    @Navbar("admin", user.Email, isAdmin)
+    <div class="row">
+
+    <div class="col-md-4"></div>
+    <div class="col-md-4">
+        <div class="card shadow-lg">
+        <div class="card-body">
+            <h4 class="text-center" style="text-decoration: underline;">Team</h4>
+            <br/>
+              </div>
+        </div>
+    </div>
+    <div class="col-md-4"></div>
+</div>
+}

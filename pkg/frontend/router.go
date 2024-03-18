@@ -41,5 +41,8 @@ func LoadFrontendRoutes(e *echo.Echo, options LoadFrontendViewOptions) {
 	e.POST("/profile/password", formSubmitUpdatePassword(options.UserManagementService), options.MiddlewareManager.LoginRequired)
 	// Admin - Team handlers
 	e.GET("/admin/team", viewTeam(options.UserManagementService), options.MiddlewareManager.LoginRequired, options.MiddlewareManager.AdminRequired)
+	e.GET("/component/admin/team_table", htmxViewTeamTable(options.UserManagementService), options.MiddlewareManager.LoginRequired, options.MiddlewareManager.AdminRequired)
+	e.POST("/component/admin/create_user", htmxCreateUserForm(options.UserManagementService), options.MiddlewareManager.LoginRequired, options.MiddlewareManager.AdminRequired)
+	e.POST("/component/admin/search_user", htmxTeamSearchForm(options.UserManagementService), options.MiddlewareManager.LoginRequired, options.MiddlewareManager.AdminRequired)
 	return
 }

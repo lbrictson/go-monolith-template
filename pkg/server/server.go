@@ -49,7 +49,6 @@ func (s *Server) Run() {
 	e := echo.New()
 	e.HideBanner = true
 	e.Use(middleware.RequestID())
-	e.Use(s.middleware.LogEnrichment)
 	frontend.LoadFrontendRoutes(e, frontend.LoadFrontendViewOptions{
 		UserManagementService: s.userManagementService,
 		SessionManager:        s.sessionHandler,

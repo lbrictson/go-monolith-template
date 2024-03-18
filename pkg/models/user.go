@@ -26,6 +26,13 @@ type User struct {
 	Role         string     `json:"role"`
 }
 
+func (u *User) HumanizeLastLogin() string {
+	if u.LastLogin == nil {
+		return "Never"
+	}
+	return u.LastLogin.Format("2006-01-02 @ 15:04 MST")
+}
+
 type SessionData struct {
 	ID           uuid.UUID `json:"id"`
 	UserID       uuid.UUID `json:"user_id"`

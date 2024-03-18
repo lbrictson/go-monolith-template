@@ -1,20 +1,143 @@
 package templates
 
-import "go-monolith-template/pkg/models"
+import (
+    "fmt"
+    "go-monolith-template/pkg/models"
+)
 
 templ PageAdminTeam(user models.User, isAdmin bool) {
     @Navbar("admin", user.Email, isAdmin)
+    <div class="container">
     <div class="row">
 
-    <div class="col-md-4"></div>
-    <div class="col-md-4">
+    <div class="col-md-3">
+    <div class="card shadow-lg">
+            <div class="card-body">
+                <h4 class="text-center" style="text-decoration: underline;">Search</h4>
+                <br/>
+                <form hx-post="/component/admin/search_user" hx-trigger="submit" hx-target="#teamtable">
+                    <div class="mb-3">
+                        <label for="search" class="form-label">Email</label>
+                        <input type="text" class="form-control" id="email" name="email" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="role" class="form-label">Role</label>
+                        <select class="form-select" name="role" aria-label="Role">
+                          <option value="" selected>Any</option>
+                          <option value="User">User</option>
+                          <option value="Admin">Admin</option>
+                        </select>
+                    </div>
+                    <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-secondary">Search</button>
+                    </div>
+                </form>
+                </div>
+                </div>
+    </div>
+    <div class="col-md-6">
         <div class="card shadow-lg">
         <div class="card-body">
             <h4 class="text-center" style="text-decoration: underline;">Team</h4>
             <br/>
+            <div hx-get="/component/admin/team_table" hx-trigger="load" id="teamtable">
+            </div>
               </div>
         </div>
     </div>
-    <div class="col-md-4"></div>
+    <div class="col-md-3">
+    <div class="card shadow-lg">
+            <div class="card-body">
+                <h4 class="text-center" style="text-decoration: underline;">New User</h4>
+                <br/>
+                <form hx-post="/component/admin/create_user" hx-trigger="submit" hx-target="#teamtable">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Initial Password</label>
+                        <input type="password" class="form-control" id="password" name="password" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="role" class="form-label">Role</label>
+                        <select class="form-select" aria-label="Role" name="role" id="role">
+                          <option value="User" selected>User</option>
+                          <option value="Admin">Admin</option>
+                        </select>
+                    </div>
+                    <div class="d-grid gap">
+                    <button type="submit" class="btn btn-secondary">Create</button>
+                    </div>
+                </form>
+                </div>
+                </div>
+    </div>
 </div>
+</div>
+}
+
+templ TeamTable(users []models.User, currentEmail string, pageNumber int, showError bool, errorMessage string, showSuccess bool, successMessage string) {
+    if showError {
+    <div class="alert alert-secondary alert-dismissible" role="alert">
+        <strong>Error: { errorMessage }</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    }
+    if showSuccess {
+    <div class="alert alert-secondary alert-dismissible" role="alert">
+        <strong>{ successMessage }</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    }
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Email</th>
+                <th scope="col">Role</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            for _, user := range users {
+            <tr>
+                <td>
+                <h6 style="margin-bottom: 1px;">{ user.Email }</h6>
+                <small>last login: {user.HumanizeLastLogin()} </small></td>
+                <td>{ user.Role }</td>
+                <td>
+                if user.Email != currentEmail {
+                <div class="dropdown">
+                  <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Actions
+                  </button>
+                  <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#">Reset Password</a></li>
+                    if user.Role == "Admin" {
+                    <li><a class="dropdown-item" href="#">Demote to User</a></li>
+                    } else {
+                    <li><a class="dropdown-item" href="#">Promote to Admin</a></li>
+                    }
+                    if user.MFAEnabled {
+                    <li><a class="dropdown-item" href="#">Disable MFA</a></li>
+                    }
+                    <li><a class="dropdown-item" href="#">Delete</a></li>
+                  </ul>
+                </div>
+                } else {
+                <span class="badge bg-secondary">You</span>
+                }
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+    <div class="btn-group" role="group">
+    if pageNumber != 0 {
+        <button type="button" class="btn btn-secondary" hx-target="#teamtable" hx-trigger="click" hx-get={fmt.Sprintf("/component/admin/team_table?page=%v", pageNumber - 1) }>Previous</button>
+    }
+    if len(users) == 10 {
+              <button type="button" class="btn btn-secondary" hx-target="#teamtable" hx-trigger="click" hx-get={fmt.Sprintf("/component/admin/team_table?page=%v", pageNumber + 1) }>Next</button>
+    }
+    </div>
 }

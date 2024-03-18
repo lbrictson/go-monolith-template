@@ -226,3 +226,52 @@ func (u *UserService) UpdatePassword(ctx context.Context, email string, newPassw
 	}
 	return nil
 }
+
+func (u *UserService) QueryUsers(ctx context.Context, options store.UserQueryOptions) ([]models.User, error) {
+	users, err := u.dbConn.UserQuery(ctx, options, 100, 0)
+	if err != nil {
+		logging.FromContext(ctx).Error("failed to query users", "error", err)
+		return nil, errors.New("Failed to query users")
+	}
+	listing := make([]models.User, 0)
+	for _, user := range users {
+		listing = append(listing, *user)
+	}
+	return listing, nil
+}
+
+func (u *UserService) ListUsers(ctx context.Context, pageNumber int, pageSize int) ([]models.User, error) {
+	users, err := u.dbConn.UserList(ctx, pageSize, pageNumber*pageSize)
+	if err != nil {
+		logging.FromContext(ctx).Error("failed to list users", "error", err)
+		return nil, errors.New("Failed to list users")
+	}
+	listing := make([]models.User, 0)
+	for _, user := range users {
+		listing = append(listing, *user)
+	}
+	return listing, nil
+}
+
+func (u *UserService) CreateUser(ctx context.Context, email string, role string, initialPassword string) (*models.User, error) {
+	email = strings.TrimSpace(strings.ToLower(email))
+	// Make sure the email isn't already taken
+	_, err := u.dbConn.UserGetByEmail(ctx, email)
+	if err == nil {
+		return nil, errors.New("Email already in use")
+	}
+	if !password_handling.IsPasswordValid(initialPassword, u.minPasswordLen, u.complexPasswords) {
+		return nil, errors.New("Invalid password")
+	}
+	hash := password_handling.HashAndSaltPassword(initialPassword)
+	user, err := u.dbConn.UserCreate(ctx, store.CreateUserOptions{
+		Email:        email,
+		PasswordHash: hash,
+		Role:         role,
+	})
+	if err != nil {
+		logging.FromContext(ctx).Error("failed to create user", "email", email, "error", err)
+		return nil, errors.New("Failed to create user")
+	}
+	return user, nil
+}

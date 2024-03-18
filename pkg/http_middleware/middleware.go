@@ -43,16 +43,6 @@ func (m *Middleware) LoginRequired(next echo.HandlerFunc) echo.HandlerFunc {
 		c.Set("auth_method", "frontend")
 		c.Set("request_id", c.Response().Header().Get(echo.HeaderXRequestID))
 		c.Set("ip", c.RealIP())
-		if data.MFAEnabled && !data.MFACompleted {
-			return c.Redirect(302, "/mfa")
-		}
-		return next(c)
-	}
-}
-
-// LogEnrichment adds session data to the logger along with request metadata
-func (m *Middleware) LogEnrichment(next echo.HandlerFunc) echo.HandlerFunc {
-	return func(c echo.Context) error {
 		l := logging.FromEchoContext(c)
 		l = l.With("http_session_id", c.Get("session_id"))
 		l = l.With("http_user_id", c.Get("user_id"))
@@ -64,6 +54,9 @@ func (m *Middleware) LogEnrichment(next echo.HandlerFunc) echo.HandlerFunc {
 		l = l.With("http_request_id", c.Response().Header().Get(echo.HeaderXRequestID))
 		c.Set("logger", l)
 		c.SetRequest(c.Request().WithContext(logging.IntoContext(c.Request().Context(), l)))
+		if data.MFAEnabled && !data.MFACompleted {
+			return c.Redirect(302, "/mfa")
+		}
 		return next(c)
 	}
 }

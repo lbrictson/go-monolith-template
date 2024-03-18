@@ -10,7 +10,11 @@ templ Navbar(activePage string, email string, isAdmin bool) {
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="#">Feature1</a>
+            if activePage == "dashboard" {
+              <a class="nav-link active" aria-current="page" href="/">Dashboard</a>
+              } else {
+                <a class="nav-link" href="/">Dashboard</a>
+            }
             </li>
             <li class="nav-item">
               <a class="nav-link" href="#">Feature2</a>
@@ -28,6 +32,9 @@ templ Navbar(activePage string, email string, isAdmin bool) {
             </li>
           </ul>
           <ul class="navbar-nav f-flex mb-2 mb-lg-0">
+            if isAdmin {
+            @navbarAdminSection(activePage)
+            }
           <li class="nav-item dropdown dropstart">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               {email}
@@ -42,4 +49,21 @@ templ Navbar(activePage string, email string, isAdmin bool) {
         </div>
       </div>
     </nav>
+}
+
+templ navbarAdminSection(activePage string) {
+    <li class="nav-item dropdown">
+    if activePage == "admin" {
+      <a class="nav-link dropdown-toggle active" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        Admin Tools
+      </a>
+      } else {
+        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Admin Tools
+        </a>
+    }
+      <ul class="dropdown-menu">
+        <li><a class="dropdown-item" href="/admin/team">Team</a></li>
+      </ul>
+    </li>
 }

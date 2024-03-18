@@ -80,7 +80,7 @@ func PageEnableMFA(user models.User, isAdmin bool, qrCode string, mfaSecret stri
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"row\"><div class=\"col-md-4\"></div><div class=\"col-md-4 d-flex align-items-center justify-content-center\"><div class=\"card shadow-lg\"><div class=\"card-body\"><h4 class=\"text-center\" style=\"text-decoration: underline;\">Enable Multifactor Authentication</h4><br><img class=\"img-thumbnail\" alt=\"QR Code\" src=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"row\"><div class=\"col-md-4\"></div><div class=\"col-md-4 d-flex align-items-center justify-content-center\"><div class=\"card shadow-lg\"><div class=\"card-body\"><h4 class=\"text-center\" style=\"text-decoration: underline;\">Enable Multifactor Authentication</h4><br><div class=\"text-center\"><img class=\"img-thumbnail\" alt=\"QR Code\" src=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -88,14 +88,14 @@ func PageEnableMFA(user models.User, isAdmin bool, qrCode string, mfaSecret stri
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"><p>Scan the QR code with your authenticator app</p><p>Or enter the code manually: ")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"></div><br><p>Scan the QR code with your authenticator app</p><p>Or enter the code manually: ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(mfaSecret)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/profile.templ`, Line: 70, Col: 57}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/profile.templ`, Line: 73, Col: 57}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {

@@ -139,7 +139,7 @@ func (s *Storage) UserDelete(ctx context.Context, id uuid.UUID) error {
 }
 
 func (s *Storage) UserList(ctx context.Context, limit int, offset int) ([]*models.User, error) {
-	entUsers, err := s.conn.User.Query().Limit(limit).Offset(offset).All(ctx)
+	entUsers, err := s.conn.User.Query().Limit(limit).Offset(offset).Order(ent.Asc(user.FieldEmail)).All(ctx)
 	if err != nil {
 		return nil, err
 	}

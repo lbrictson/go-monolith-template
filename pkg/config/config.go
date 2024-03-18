@@ -51,7 +51,7 @@ type Security struct {
 	FailedLoginLockout            bool   `default:"true"`
 	FailedLoginLockoutTimeMinutes int    `default:"5"`
 	FailedLoginLockoutAttempts    int    `default:"5"`
-	MaxSessionAgeSeconds          int    `default:"3600"`
+	MaxSessionAgeSeconds          int    `default:"86400"` // 24 hours
 }
 
 type Logging struct {

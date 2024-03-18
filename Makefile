@@ -54,8 +54,6 @@ generate:
 dependencies:
 	@echo "Installing dependencies..."
 	@go mod download
-	@go mod tidy
-	@go mod vendor
 	@go install github.com/a-h/templ/cmd/templ@latest
 	@go get github.com/a-h/templ
 

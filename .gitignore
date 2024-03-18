@@ -27,6 +27,7 @@ go.work
 local/data/*.db
 local/data/*wal
 local/data/*shm
+local/test_dbs/test_db_*
 
 # Ignore air builds
 tmp/

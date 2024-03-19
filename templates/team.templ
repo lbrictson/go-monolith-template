@@ -105,14 +105,14 @@ templ TeamTable(users []models.User, currentEmail string, pageNumber int, notifi
                   <ul class="dropdown-menu">
                     <li><a class="dropdown-item" href={templ.URL(fmt.Sprintf("/admin/team/set_password/%v", user.ID))}>Reset Password</a></li>
                     if user.Role == "Admin" {
-                    <li><a class="dropdown-item" href="#">Demote to User</a></li>
+                    <li><a class="dropdown-item" hx-target="#teamtable" hx-post={fmt.Sprintf("/component/admin/team/swap_role/%v", user.ID)}>Demote to User</a></li>
                     } else {
-                    <li><a class="dropdown-item" href="#">Promote to Admin</a></li>
+                    <li><a class="dropdown-item" hx-target="#teamtable" hx-post={fmt.Sprintf("/component/admin/team/swap_role/%v", user.ID)}>Promote to Admin</a></li>
                     }
                     if user.MFAEnabled {
-                    <li><a class="dropdown-item" href="#">Disable MFA</a></li>
+                    <li><a class="dropdown-item" hx-target="#teamtable" hx-post={fmt.Sprintf("/component/admin/team/disable_mfa/%v", user.ID)}>Disable MFA</a></li>
                     }
-                    <li><a class="dropdown-item" href="#">Delete</a></li>
+                    <li><a class="dropdown-item" hx-confirm={fmt.Sprintf("Are you sure you want to delete %v?", user.Email)} hx-target="#teamtable" hx-delete={fmt.Sprintf("/component/admin/team/delete/%v", user.ID)}>Delete</a></li>
                   </ul>
                 </div>
                 } else {

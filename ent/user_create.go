@@ -166,6 +166,34 @@ func (uc *UserCreate) SetNillableRole(s *string) *UserCreate {
 	return uc
 }
 
+// SetPasswordResetTokenExpiration sets the "password_reset_token_expiration" field.
+func (uc *UserCreate) SetPasswordResetTokenExpiration(t time.Time) *UserCreate {
+	uc.mutation.SetPasswordResetTokenExpiration(t)
+	return uc
+}
+
+// SetNillablePasswordResetTokenExpiration sets the "password_reset_token_expiration" field if the given value is not nil.
+func (uc *UserCreate) SetNillablePasswordResetTokenExpiration(t *time.Time) *UserCreate {
+	if t != nil {
+		uc.SetPasswordResetTokenExpiration(*t)
+	}
+	return uc
+}
+
+// SetPasswordResetToken sets the "password_reset_token" field.
+func (uc *UserCreate) SetPasswordResetToken(s string) *UserCreate {
+	uc.mutation.SetPasswordResetToken(s)
+	return uc
+}
+
+// SetNillablePasswordResetToken sets the "password_reset_token" field if the given value is not nil.
+func (uc *UserCreate) SetNillablePasswordResetToken(s *string) *UserCreate {
+	if s != nil {
+		uc.SetPasswordResetToken(*s)
+	}
+	return uc
+}
+
 // SetID sets the "id" field.
 func (uc *UserCreate) SetID(u uuid.UUID) *UserCreate {
 	uc.mutation.SetID(u)
@@ -378,6 +406,14 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	if value, ok := uc.mutation.Role(); ok {
 		_spec.SetField(user.FieldRole, field.TypeString, value)
 		_node.Role = value
+	}
+	if value, ok := uc.mutation.PasswordResetTokenExpiration(); ok {
+		_spec.SetField(user.FieldPasswordResetTokenExpiration, field.TypeTime, value)
+		_node.PasswordResetTokenExpiration = &value
+	}
+	if value, ok := uc.mutation.PasswordResetToken(); ok {
+		_spec.SetField(user.FieldPasswordResetToken, field.TypeString, value)
+		_node.PasswordResetToken = value
 	}
 	if nodes := uc.mutation.UserSessionIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

@@ -1,11 +1,17 @@
 package templates
 
-templ LoginPage() {
+templ LoginPage(showSuccessReset bool) {
 <div class="row">
     <div class="col-md-4"></div>
     <div class="col-md-4" style="padding-top: 8rem;">
         <div class="card shadow-lg">
         <div class="card-body">
+            if showSuccessReset {
+            <div class="alert alert-secondary alert-dismissible fade show" role="alert">
+              <strong>Success</strong> Password reset successful. You can now login.
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            }
             <h3 class="text-center">Application Name</h3>
             <hr />
             <form class="form" action="/login" method="post">
@@ -20,7 +26,7 @@ templ LoginPage() {
             </div>
             </form>
             <hr />
-            <p>Forgot your password? <a href="/forgot-password">Reset it</a></p>
+            <p>Forgot your password? <a href="/reset_password">Reset it</a></p>
         </div>
         </div>
     </div>
@@ -45,6 +51,64 @@ templ MFAPage(email string) {
             </div>
             <div class="d-grid gap-2">
               <button class="btn btn-secondary" type="submit">Submit</button>
+            </div>
+            </form>
+        </div>
+        </div>
+    </div>
+    <div class="col-md-4"></div>
+</div>
+}
+
+templ ResetPasswordPage(success bool) {
+<div class="row">
+    <div class="col-md-4"></div>
+    <div class="col-md-4" style="padding-top: 8rem;">
+        <div class="card shadow-lg">
+        <div class="card-body">
+         if success {
+            <div class="alert alert-secondary alert-dismissible fade show" role="alert">
+              <strong>Success</strong> If an account exists with the requested email a password reset email will be sent.
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            }
+            <h3 class="text-center">Request a Password Reset Email</h3>
+            <hr />
+            <form class="form" action="/reset_password" method="post">
+            <div class="mb-3">
+            <input class="form-control" type="email" name="email" required placeholder="Email" />
+            </div>
+            <div class="d-grid gap-2">
+              <button class="btn btn-secondary" type="submit">Request Password Reset</button>
+            </div>
+            </form>
+        </div>
+        </div>
+    </div>
+    <div class="col-md-4"></div>
+</div>
+}
+
+templ SetPasswordPage(token string, email string) {
+<div class="row">
+    <div class="col-md-4"></div>
+    <div class="col-md-4" style="padding-top: 8rem;">
+        <div class="card shadow-lg">
+        <div class="card-body">
+            <h3 class="text-center">Set a New Password</h3>
+            <hr />
+            <form class="form" action="/set_password" method="post">
+            <div class="mb-3">
+            <input class="form-control" type="email" name="email" hidden value={email} />
+            </div>
+            <div class="mb-3">
+            <input class="form-control" type="text" name="token" hidden value={token} />
+            </div>
+            <div class="mb-3">
+            <input class="form-control" type="password" name="password" required placeholder="Password" />
+            </div>
+            <div class="d-grid gap-2">
+              <button class="btn btn-secondary" type="submit">Set Password</button>
             </div>
             </form>
         </div>

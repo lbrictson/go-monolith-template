@@ -5,6 +5,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"go-monolith-template/pkg/core"
+	"go-monolith-template/pkg/models"
 	"go-monolith-template/pkg/session_handling"
 	"go-monolith-template/pkg/store"
 	"go-monolith-template/templates"
@@ -153,5 +154,120 @@ func viewAdminSetPassword(u *core.UserService) echo.HandlerFunc {
 		}
 		return templates.Page("Template | Team", templates.AdminSetPasswordPage(c.Get("email").(string), c.Get("isAdmin").(bool), *user),
 			c.Get("notifications").([]session_handling.Notification)).Render(c.Request().Context(), c.Response().Writer)
+	}
+}
+
+func htmxAdminSwapRole(u *core.UserService) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		ctx := c.Request().Context()
+		users, _ := u.ListUsers(ctx, 0, 10)
+		id := c.Param("id")
+		user, err := u.GetUserByID(ctx, uuid.MustParse(id))
+		if err != nil {
+			return templates.TeamTable(users, c.Get("email").(string),
+				0, []session_handling.Notification{
+					{
+						Header:  "Error",
+						Message: fmt.Sprintf("%v", err.Error()),
+						IsError: true,
+					}}).Render(c.Request().Context(), c.Response().Writer)
+		}
+		if user.Role == models.ADMIN_ROLE {
+			user.Role = models.USER_ROLE
+		} else {
+			user.Role = models.ADMIN_ROLE
+		}
+		err = u.UpdateUser(ctx, uuid.MustParse(id), store.UpdateUserOptions{
+			Role: &user.Role,
+		})
+		if err != nil {
+			return templates.TeamTable(users, c.Get("email").(string),
+				0, []session_handling.Notification{
+					{
+						Header:  "Error",
+						Message: fmt.Sprintf("%v", err.Error()),
+						IsError: true,
+					}}).Render(c.Request().Context(), c.Response().Writer)
+		}
+		users, _ = u.ListUsers(ctx, 0, 10)
+		return templates.TeamTable(users, c.Get("email").(string),
+			0, []session_handling.Notification{
+				{
+					Header:  "Success",
+					Message: fmt.Sprintf("%v role changed to %v", user.Email, user.Role),
+					IsError: false,
+				}}).Render(c.Request().Context(), c.Response().Writer)
+	}
+}
+
+func htmxAdminDisableMFA(u *core.UserService) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		ctx := c.Request().Context()
+		users, _ := u.ListUsers(ctx, 0, 10)
+		id := c.Param("id")
+		user, err := u.GetUserByID(ctx, uuid.MustParse(id))
+		if err != nil {
+			return templates.TeamTable(users, c.Get("email").(string),
+				0, []session_handling.Notification{
+					{
+						Header:  "Error",
+						Message: fmt.Sprintf("%v", err.Error()),
+						IsError: true,
+					}}).Render(c.Request().Context(), c.Response().Writer)
+		}
+		err = u.DisableMFA(ctx, user.Email)
+		if err != nil {
+			return templates.TeamTable(users, c.Get("email").(string),
+				0, []session_handling.Notification{
+					{
+						Header:  "Error",
+						Message: fmt.Sprintf("%v", err.Error()),
+						IsError: true,
+					}}).Render(c.Request().Context(), c.Response().Writer)
+		}
+		users, _ = u.ListUsers(ctx, 0, 10)
+		return templates.TeamTable(users, c.Get("email").(string),
+			0, []session_handling.Notification{
+				{
+					Header:  "Success",
+					Message: fmt.Sprintf("%v MFA disabled", user.Email),
+					IsError: false,
+				}}).Render(c.Request().Context(), c.Response().Writer)
+	}
+}
+
+func htmxAdminDeleteUser(u *core.UserService) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		ctx := c.Request().Context()
+		users, _ := u.ListUsers(ctx, 0, 10)
+		id := c.Param("id")
+		user, err := u.GetUserByID(ctx, uuid.MustParse(id))
+		if err != nil {
+			return templates.TeamTable(users, c.Get("email").(string),
+				0, []session_handling.Notification{
+					{
+						Header:  "Error",
+						Message: fmt.Sprintf("%v", err.Error()),
+						IsError: true,
+					}}).Render(c.Request().Context(), c.Response().Writer)
+		}
+		err = u.DeleteUser(ctx, user.Email)
+		if err != nil {
+			return templates.TeamTable(users, c.Get("email").(string),
+				0, []session_handling.Notification{
+					{
+						Header:  "Error",
+						Message: fmt.Sprintf("%v", err.Error()),
+						IsError: true,
+					}}).Render(c.Request().Context(), c.Response().Writer)
+		}
+		users, _ = u.ListUsers(ctx, 0, 10)
+		return templates.TeamTable(users, c.Get("email").(string),
+			0, []session_handling.Notification{
+				{
+					Header:  "Success",
+					Message: fmt.Sprintf("%v deleted", user.Email),
+					IsError: false,
+				}}).Render(c.Request().Context(), c.Response().Writer)
 	}
 }

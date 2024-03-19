@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"go-monolith-template/mailer/smtp_adapter"
 	"go-monolith-template/pkg/config"
 	"go-monolith-template/pkg/core"
 	"go-monolith-template/pkg/http_middleware"
@@ -30,9 +31,18 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	mailService := smtp_adapter.New(smtp_adapter.Options{
+		Host:     parsedConfig.Email.Host,
+		Port:     parsedConfig.Email.Port,
+		Username: parsedConfig.Email.Username,
+		Password: parsedConfig.Email.Password,
+		From:     parsedConfig.Email.From,
+	})
 	// Wire user management service
 	userMgt := core.NewUserService(core.UserServiceOptions{
 		StorageLayer:             storageLayer,
+		EmailService:             mailService,
+		ServerURL:                parsedConfig.Server.CallbackURL,
 		LockoutThreshold:         parsedConfig.Security.FailedLoginLockoutAttempts,
 		ComplexPasswordsRequired: parsedConfig.Security.RequireComplexPasswords,
 		MinPasswordLength:        parsedConfig.Security.MinPasswordLength,
@@ -57,6 +67,7 @@ func main() {
 		UserManagementService: userMgt,
 		Middleware:            middle,
 		SessionHandler:        sessionHandler,
+		MailService:           mailService,
 	})
 	defer storageLayer.Close()
 	s.Run()

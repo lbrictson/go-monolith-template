@@ -11,7 +11,11 @@ import (
 
 func viewLogin() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		return templates.Page("Template | Login", templates.LoginPage(),
+		showSuccessReset := false
+		if c.QueryParam("password_reset") == "true" {
+			showSuccessReset = true
+		}
+		return templates.Page("Template | Login", templates.LoginPage(showSuccessReset),
 			nil).Render(c.Request().Context(), c.Response().Writer)
 	}
 }
@@ -101,5 +105,59 @@ func hookDisableMFA(a *core.UserService) echo.HandlerFunc {
 		}
 		c.Response().Header().Set("HX-Redirect", "/profile")
 		return c.String(http.StatusOK, "MFA has been disabled")
+	}
+}
+
+func viewPasswordReset() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		if c.QueryParam("email") == "" {
+			success := c.QueryParam("success")
+			s := false
+			if success == "true" {
+				s = true
+			}
+			return templates.Page("Template | Password Reset", templates.ResetPasswordPage(s),
+				nil).Render(c.Request().Context(), c.Response().Writer)
+		}
+		return templates.Page("Template | Password Reset", templates.SetPasswordPage(c.QueryParam("token"), c.QueryParam("email")),
+			nil).Render(c.Request().Context(), c.Response().Writer)
+	}
+}
+
+func formSubmitPasswordReset(a *core.UserService) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		ctx := c.Request().Context()
+		type form struct {
+			Email string `form:"email"`
+		}
+		f := new(form)
+		if err := c.Bind(f); err != nil {
+			return templates.Page("Template | Error", templates.ErrorPage("Error parsing form"),
+				nil).Render(ctx, c.Response().Writer)
+		}
+		a.RequestPasswordReset(ctx, f.Email)
+		return c.Redirect(http.StatusFound, "/reset_password?success=true")
+	}
+}
+
+func formSubmitSetPassword(a *core.UserService) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		ctx := c.Request().Context()
+		type form struct {
+			Email    string `form:"email"`
+			Token    string `form:"token"`
+			Password string `form:"password"`
+		}
+		f := new(form)
+		if err := c.Bind(f); err != nil {
+			return templates.Page("Template | Error", templates.ErrorPage("Error parsing form"),
+				nil).Render(ctx, c.Response().Writer)
+		}
+		err := a.SetPasswordViaResetToken(ctx, f.Email, f.Token, f.Password)
+		if err != nil {
+			return templates.Page("Template | Error", templates.ErrorPage(err.Error()),
+				nil).Render(ctx, c.Response().Writer)
+		}
+		return c.Redirect(http.StatusFound, "/login?password_reset=true")
 	}
 }

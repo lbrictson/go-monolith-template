@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"go-monolith-template/mailer"
 	"go-monolith-template/pkg/core"
 	"go-monolith-template/pkg/frontend"
 	"go-monolith-template/pkg/http_middleware"
@@ -23,6 +24,7 @@ type NewServerOptions struct {
 	UserManagementService *core.UserService
 	Middleware            *http_middleware.Middleware
 	SessionHandler        *session_handling.SessionManager
+	MailService           mailer.Emailer
 }
 
 func NewServer(opts NewServerOptions) *Server {
@@ -32,6 +34,7 @@ func NewServer(opts NewServerOptions) *Server {
 		userManagementService: opts.UserManagementService,
 		middleware:            opts.Middleware,
 		sessionHandler:        opts.SessionHandler,
+		mailService:           opts.MailService,
 	}
 }
 
@@ -41,6 +44,7 @@ type Server struct {
 	userManagementService *core.UserService
 	middleware            *http_middleware.Middleware
 	sessionHandler        *session_handling.SessionManager
+	mailService           mailer.Emailer
 }
 
 func (s *Server) Run() {
@@ -53,6 +57,7 @@ func (s *Server) Run() {
 		UserManagementService: s.userManagementService,
 		SessionManager:        s.sessionHandler,
 		MiddlewareManager:     s.middleware,
+		MailService:           s.mailService,
 	})
 	go func() {
 		if err := e.Start(fmt.Sprintf(":%v", s.port)); err != nil && !errors.Is(err, http.ErrServerClosed) {

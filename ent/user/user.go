@@ -39,6 +39,10 @@ const (
 	FieldAPIKey = "api_key"
 	// FieldRole holds the string denoting the role field in the database.
 	FieldRole = "role"
+	// FieldPasswordResetTokenExpiration holds the string denoting the password_reset_token_expiration field in the database.
+	FieldPasswordResetTokenExpiration = "password_reset_token_expiration"
+	// FieldPasswordResetToken holds the string denoting the password_reset_token field in the database.
+	FieldPasswordResetToken = "password_reset_token"
 	// EdgeUserSession holds the string denoting the user_session edge name in mutations.
 	EdgeUserSession = "user_session"
 	// Table holds the table name of the user in the database.
@@ -67,6 +71,8 @@ var Columns = []string{
 	FieldLockedAt,
 	FieldAPIKey,
 	FieldRole,
+	FieldPasswordResetTokenExpiration,
+	FieldPasswordResetToken,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -166,6 +172,16 @@ func ByAPIKey(opts ...sql.OrderTermOption) OrderOption {
 // ByRole orders the results by the role field.
 func ByRole(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldRole, opts...).ToFunc()
+}
+
+// ByPasswordResetTokenExpiration orders the results by the password_reset_token_expiration field.
+func ByPasswordResetTokenExpiration(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPasswordResetTokenExpiration, opts...).ToFunc()
+}
+
+// ByPasswordResetToken orders the results by the password_reset_token field.
+func ByPasswordResetToken(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPasswordResetToken, opts...).ToFunc()
 }
 
 // ByUserSessionCount orders the results by user_session count.

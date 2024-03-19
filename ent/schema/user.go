@@ -25,6 +25,8 @@ func (User) Fields() []ent.Field {
 		field.Time("locked_at").Optional(),
 		field.String("api_key"),
 		field.String("role").Default("user"),
+		field.Time("password_reset_token_expiration").Optional().Nillable(),
+		field.String("password_reset_token").Optional(),
 	}
 }
 

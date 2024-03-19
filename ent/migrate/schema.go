@@ -45,6 +45,8 @@ var (
 		{Name: "locked_at", Type: field.TypeTime, Nullable: true},
 		{Name: "api_key", Type: field.TypeString},
 		{Name: "role", Type: field.TypeString, Default: "user"},
+		{Name: "password_reset_token_expiration", Type: field.TypeTime, Nullable: true},
+		{Name: "password_reset_token", Type: field.TypeString, Nullable: true},
 	}
 	// UsersTable holds the schema information for the "users" table.
 	UsersTable = &schema.Table{

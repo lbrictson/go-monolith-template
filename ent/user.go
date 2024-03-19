@@ -42,6 +42,10 @@ type User struct {
 	APIKey string `json:"api_key,omitempty"`
 	// Role holds the value of the "role" field.
 	Role string `json:"role,omitempty"`
+	// PasswordResetTokenExpiration holds the value of the "password_reset_token_expiration" field.
+	PasswordResetTokenExpiration *time.Time `json:"password_reset_token_expiration,omitempty"`
+	// PasswordResetToken holds the value of the "password_reset_token" field.
+	PasswordResetToken string `json:"password_reset_token,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the UserQuery when eager-loading is set.
 	Edges        UserEdges `json:"edges"`
@@ -73,9 +77,9 @@ func (*User) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case user.FieldMfaEnabled, user.FieldInvited, user.FieldLocked:
 			values[i] = new(sql.NullBool)
-		case user.FieldEmail, user.FieldPasswordHash, user.FieldMfaSecret, user.FieldAPIKey, user.FieldRole:
+		case user.FieldEmail, user.FieldPasswordHash, user.FieldMfaSecret, user.FieldAPIKey, user.FieldRole, user.FieldPasswordResetToken:
 			values[i] = new(sql.NullString)
-		case user.FieldCreatedAt, user.FieldUpdatedAt, user.FieldLastLogin, user.FieldLockedAt:
+		case user.FieldCreatedAt, user.FieldUpdatedAt, user.FieldLastLogin, user.FieldLockedAt, user.FieldPasswordResetTokenExpiration:
 			values[i] = new(sql.NullTime)
 		case user.FieldID:
 			values[i] = new(uuid.UUID)
@@ -172,6 +176,19 @@ func (u *User) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				u.Role = value.String
 			}
+		case user.FieldPasswordResetTokenExpiration:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field password_reset_token_expiration", values[i])
+			} else if value.Valid {
+				u.PasswordResetTokenExpiration = new(time.Time)
+				*u.PasswordResetTokenExpiration = value.Time
+			}
+		case user.FieldPasswordResetToken:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field password_reset_token", values[i])
+			} else if value.Valid {
+				u.PasswordResetToken = value.String
+			}
 		default:
 			u.selectValues.Set(columns[i], values[i])
 		}
@@ -248,6 +265,14 @@ func (u *User) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("role=")
 	builder.WriteString(u.Role)
+	builder.WriteString(", ")
+	if v := u.PasswordResetTokenExpiration; v != nil {
+		builder.WriteString("password_reset_token_expiration=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
+	builder.WriteString(", ")
+	builder.WriteString("password_reset_token=")
+	builder.WriteString(u.PasswordResetToken)
 	builder.WriteByte(')')
 	return builder.String()
 }

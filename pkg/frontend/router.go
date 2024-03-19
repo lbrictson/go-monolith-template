@@ -2,6 +2,7 @@ package frontend
 
 import (
 	"github.com/labstack/echo/v4"
+	"go-monolith-template/mailer"
 	"go-monolith-template/pkg/core"
 	"go-monolith-template/pkg/http_middleware"
 	"go-monolith-template/pkg/session_handling"
@@ -14,6 +15,7 @@ type LoadFrontendViewOptions struct {
 	UserManagementService *core.UserService
 	SessionManager        *session_handling.SessionManager
 	MiddlewareManager     *http_middleware.Middleware
+	MailService           mailer.Emailer
 }
 
 func LoadFrontendRoutes(e *echo.Echo, options LoadFrontendViewOptions) {
@@ -29,6 +31,9 @@ func LoadFrontendRoutes(e *echo.Echo, options LoadFrontendViewOptions) {
 	e.GET("/login", viewLogin())
 	e.POST("/login", formSubmitLogin(options.UserManagementService, options.SessionManager))
 	e.GET("/logout", hookLogout(options.SessionManager))
+	e.GET("/reset_password", viewPasswordReset())
+	e.POST("/set_password", formSubmitSetPassword(options.UserManagementService))
+	e.POST("/reset_password", formSubmitPasswordReset(options.UserManagementService))
 	e.GET("/mfa", viewMFA())
 	e.POST("/mfa", formSubmitMFA(options.UserManagementService, options.SessionManager))
 	// Dashboard handlers
@@ -42,7 +47,12 @@ func LoadFrontendRoutes(e *echo.Echo, options LoadFrontendViewOptions) {
 	// Admin - Team handlers
 	e.GET("/admin/team", viewTeam(options.UserManagementService), options.MiddlewareManager.LoginRequired, options.MiddlewareManager.AdminRequired)
 	e.GET("/component/admin/team_table", htmxViewTeamTable(options.UserManagementService), options.MiddlewareManager.LoginRequired, options.MiddlewareManager.AdminRequired)
-	e.POST("/component/admin/create_user", htmxCreateUserForm(options.UserManagementService), options.MiddlewareManager.LoginRequired, options.MiddlewareManager.AdminRequired)
+	e.POST("/component/admin/create_user", htmxCreateUserForm(options.UserManagementService, options.SessionManager), options.MiddlewareManager.LoginRequired, options.MiddlewareManager.AdminRequired)
 	e.POST("/component/admin/search_user", htmxTeamSearchForm(options.UserManagementService), options.MiddlewareManager.LoginRequired, options.MiddlewareManager.AdminRequired)
+	e.POST("/admin/team/set_password", formAdminSetPassword(options.UserManagementService, options.SessionManager), options.MiddlewareManager.LoginRequired, options.MiddlewareManager.AdminRequired)
+	e.GET("/admin/team/set_password/:id", viewAdminSetPassword(options.UserManagementService), options.MiddlewareManager.LoginRequired, options.MiddlewareManager.AdminRequired)
+	e.POST("/component/admin/team/disable_mfa/:id", htmxAdminDisableMFA(options.UserManagementService), options.MiddlewareManager.LoginRequired, options.MiddlewareManager.AdminRequired)
+	e.POST("/component/admin/team/swap_role/:id", htmxAdminSwapRole(options.UserManagementService), options.MiddlewareManager.LoginRequired, options.MiddlewareManager.AdminRequired)
+	e.DELETE("/component/admin/team/delete/:id", htmxAdminDeleteUser(options.UserManagementService), options.MiddlewareManager.LoginRequired, options.MiddlewareManager.AdminRequired)
 	return
 }

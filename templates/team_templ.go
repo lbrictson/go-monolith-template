@@ -13,6 +13,7 @@ import "bytes"
 import (
 	"fmt"
 	"go-monolith-template/pkg/models"
+	"go-monolith-template/pkg/session_handling"
 )
 
 func PageAdminTeam(user models.User, isAdmin bool) templ.Component {
@@ -32,7 +33,7 @@ func PageAdminTeam(user models.User, isAdmin bool) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"container\"><div class=\"row\"><div class=\"col-md-3\"><div class=\"card shadow-lg\"><div class=\"card-body\"><h4 class=\"text-center\" style=\"text-decoration: underline;\">Search</h4><br><form hx-post=\"/component/admin/search_user\" hx-trigger=\"submit\" hx-target=\"#teamtable\"><div class=\"mb-3\"><label for=\"search\" class=\"form-label\">Email</label> <input type=\"text\" class=\"form-control\" id=\"email\" name=\"email\"></div><div class=\"mb-3\"><label for=\"role\" class=\"form-label\">Role</label> <select class=\"form-select\" name=\"role\" aria-label=\"Role\"><option value=\"\" selected>Any</option> <option value=\"User\">User</option> <option value=\"Admin\">Admin</option></select></div><div class=\"d-grid gap-2\"><button type=\"submit\" class=\"btn btn-secondary\">Search</button></div></form></div></div></div><div class=\"col-md-6\"><div class=\"card shadow-lg\"><div class=\"card-body\"><h4 class=\"text-center\" style=\"text-decoration: underline;\">Team</h4><br><div hx-get=\"/component/admin/team_table\" hx-trigger=\"load\" id=\"teamtable\"></div></div></div></div><div class=\"col-md-3\"><div class=\"card shadow-lg\"><div class=\"card-body\"><h4 class=\"text-center\" style=\"text-decoration: underline;\">New User</h4><br><form hx-post=\"/component/admin/create_user\" hx-trigger=\"submit\" hx-target=\"#teamtable\"><div class=\"mb-3\"><label for=\"email\" class=\"form-label\">Email</label> <input type=\"email\" class=\"form-control\" id=\"email\" name=\"email\" required></div><div class=\"mb-3\"><label for=\"password\" class=\"form-label\">Initial Password</label> <input type=\"password\" class=\"form-control\" id=\"password\" name=\"password\" required></div><div class=\"mb-3\"><label for=\"role\" class=\"form-label\">Role</label> <select class=\"form-select\" aria-label=\"Role\" name=\"role\" id=\"role\"><option value=\"User\" selected>User</option> <option value=\"Admin\">Admin</option></select></div><div class=\"d-grid gap\"><button type=\"submit\" class=\"btn btn-secondary\">Create</button></div></form></div></div></div></div></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"container\"><div class=\"row\"><div class=\"col-md-3\"><div class=\"card shadow-lg\"><div class=\"card-body\"><h4 class=\"text-center\" style=\"text-decoration: underline;\">Search</h4><br><form hx-post=\"/component/admin/search_user\" hx-trigger=\"submit\" hx-target=\"#teamtable\"><div class=\"mb-3\"><label for=\"search\" class=\"form-label\">Email</label> <input type=\"text\" class=\"form-control\" id=\"email\" name=\"email\"></div><div class=\"mb-3\"><label for=\"role\" class=\"form-label\">Role</label> <select class=\"form-select\" name=\"role\" aria-label=\"Role\"><option value=\"\" selected>Any</option> <option value=\"User\">User</option> <option value=\"Admin\">Admin</option></select></div><div class=\"d-grid gap-2\"><button type=\"submit\" class=\"btn btn-secondary\">Search</button></div><br><a href=\"/admin/team\">Reset</a></form></div></div></div><div class=\"col-md-6\"><div class=\"card shadow-lg\"><div class=\"card-body\"><h4 class=\"text-center\" style=\"text-decoration: underline;\">Team</h4><br><div hx-get=\"/component/admin/team_table\" hx-trigger=\"load\" id=\"teamtable\"></div></div></div></div><div class=\"col-md-3\"><div class=\"card shadow-lg\"><div class=\"card-body\"><h4 class=\"text-center\" style=\"text-decoration: underline;\">New User</h4><br><form hx-post=\"/component/admin/create_user\" hx-trigger=\"submit\" hx-target=\"#teamtable\"><div class=\"mb-3\"><label for=\"email\" class=\"form-label\">Email</label> <input type=\"email\" class=\"form-control\" name=\"email\" required></div><div class=\"mb-3\"><label for=\"password\" class=\"form-label\">Initial Password</label> <input type=\"password\" class=\"form-control\" id=\"password\" name=\"password\" required></div><div class=\"mb-3\"><label for=\"role\" class=\"form-label\">Role</label> <select class=\"form-select\" aria-label=\"Role\" name=\"role\" id=\"role\"><option value=\"User\" selected>User</option> <option value=\"Admin\">Admin</option></select></div><div class=\"d-grid gap\"><button type=\"submit\" class=\"btn btn-secondary\">Create</button></div></form></div></div></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -43,7 +44,7 @@ func PageAdminTeam(user models.User, isAdmin bool) templ.Component {
 	})
 }
 
-func TeamTable(users []models.User, currentEmail string, pageNumber int, showError bool, errorMessage string, showSuccess bool, successMessage string) templ.Component {
+func TeamTable(users []models.User, currentEmail string, pageNumber int, notifications []session_handling.Notification) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {
@@ -56,44 +57,6 @@ func TeamTable(users []models.User, currentEmail string, pageNumber int, showErr
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		if showError {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"alert alert-secondary alert-dismissible\" role=\"alert\"><strong>Error: ")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var3 string
-			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(errorMessage)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/team.templ`, Line: 82, Col: 37}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</strong> <button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\"></button></div>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		if showSuccess {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"alert alert-secondary alert-dismissible\" role=\"alert\"><strong>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var4 string
-			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(successMessage)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/team.templ`, Line: 88, Col: 32}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</strong> <button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\"></button></div>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<table class=\"table\"><thead><tr><th scope=\"col\">Email</th><th scope=\"col\">Role</th><th scope=\"col\"></th></tr></thead> <tbody>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -103,12 +66,12 @@ func TeamTable(users []models.User, currentEmail string, pageNumber int, showErr
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var5 string
-			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(user.Email)
+			var templ_7745c5c3_Var3 string
+			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(user.Email)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/team.templ`, Line: 104, Col: 60}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/team.templ`, Line: 95, Col: 60}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -116,12 +79,12 @@ func TeamTable(users []models.User, currentEmail string, pageNumber int, showErr
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var6 string
-			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(user.HumanizeLastLogin())
+			var templ_7745c5c3_Var4 string
+			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(user.HumanizeLastLogin())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/team.templ`, Line: 105, Col: 60}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/team.templ`, Line: 96, Col: 60}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -129,12 +92,12 @@ func TeamTable(users []models.User, currentEmail string, pageNumber int, showErr
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var7 string
-			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(user.Role)
+			var templ_7745c5c3_Var5 string
+			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(user.Role)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/team.templ`, Line: 106, Col: 31}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/team.templ`, Line: 97, Col: 31}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -143,28 +106,77 @@ func TeamTable(users []models.User, currentEmail string, pageNumber int, showErr
 				return templ_7745c5c3_Err
 			}
 			if user.Email != currentEmail {
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"dropdown\"><button class=\"btn btn-secondary btn-sm dropdown-toggle\" type=\"button\" data-bs-toggle=\"dropdown\" aria-expanded=\"false\">Actions\r</button><ul class=\"dropdown-menu\"><li><a class=\"dropdown-item\" href=\"#\">Reset Password</a></li>")
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"dropdown\"><button class=\"btn btn-secondary btn-sm dropdown-toggle\" type=\"button\" data-bs-toggle=\"dropdown\" aria-expanded=\"false\">Actions\r</button><ul class=\"dropdown-menu\"><li><a class=\"dropdown-item\" href=\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var6 templ.SafeURL = templ.URL(fmt.Sprintf("/admin/team/set_password/%v", user.ID))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var6)))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\">Reset Password</a></li>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				if user.Role == "Admin" {
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<li><a class=\"dropdown-item\" href=\"#\">Demote to User</a></li>")
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<li><a class=\"dropdown-item\" hx-target=\"#teamtable\" hx-post=\"")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(fmt.Sprintf("/component/admin/team/swap_role/%v", user.ID)))
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\">Demote to User</a></li>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				} else {
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<li><a class=\"dropdown-item\" href=\"#\">Promote to Admin</a></li>")
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<li><a class=\"dropdown-item\" hx-target=\"#teamtable\" hx-post=\"")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(fmt.Sprintf("/component/admin/team/swap_role/%v", user.ID)))
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\">Promote to Admin</a></li>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				}
 				if user.MFAEnabled {
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<li><a class=\"dropdown-item\" href=\"#\">Disable MFA</a></li>")
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<li><a class=\"dropdown-item\" hx-target=\"#teamtable\" hx-post=\"")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(fmt.Sprintf("/component/admin/team/disable_mfa/%v", user.ID)))
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\">Disable MFA</a></li>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<li><a class=\"dropdown-item\" href=\"#\">Delete</a></li></ul></div>")
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<li><a class=\"dropdown-item\" hx-confirm=\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(fmt.Sprintf("Are you sure you want to delete %v?", user.Email)))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-target=\"#teamtable\" hx-delete=\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(fmt.Sprintf("/component/admin/team/delete/%v", user.ID)))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\">Delete</a></li></ul></div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -212,6 +224,61 @@ func TeamTable(users []models.User, currentEmail string, pageNumber int, showErr
 			}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		for _, notification := range notifications {
+			templ_7745c5c3_Err = Notification(notification.Header, notification.Message).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		if !templ_7745c5c3_IsBuffer {
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteTo(templ_7745c5c3_W)
+		}
+		return templ_7745c5c3_Err
+	})
+}
+
+func AdminSetPasswordPage(email string, isAdmin bool, targetUser models.User) templ.Component {
+	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
+		if !templ_7745c5c3_IsBuffer {
+			templ_7745c5c3_Buffer = templ.GetBuffer()
+			defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var7 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var7 == nil {
+			templ_7745c5c3_Var7 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = Navbar("admin", email, isAdmin).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"container\"><div class=\"row\"><div class=\"col-md-3\"></div><div class=\"col-md-6\"><div class=\"card shadow-lg\"><div class=\"card-body\"><h4 class=\"text-center\" style=\"text-decoration: underline;\">Set Password</h4><br><form method=\"post\" action=\"/admin/team/set_password\"><input type=\"hidden\" name=\"email\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(targetUser.Email))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"><div class=\"mb-3\"><label for=\"password\" class=\"form-label\">New Password for ")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var8 string
+		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(targetUser.Email)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/team.templ`, Line: 152, Col: 95}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</label> <input type=\"password\" class=\"form-control\" name=\"password\" required></div><div class=\"d-grid gap\"><button type=\"submit\" class=\"btn btn-secondary\">Set Password</button></div></form></div></div></div><div class=\"col-md-3\"><a href=\"/admin/team\" class=\"btn btn-secondary\">Back</a></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

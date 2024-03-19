@@ -11,17 +11,19 @@ import (
 
 func convertEntUserModelToDomainUserModel(entUser *ent.User) *models.User {
 	u := models.User{
-		ID:           entUser.ID,
-		Email:        entUser.Email,
-		PasswordHash: entUser.PasswordHash,
-		Locked:       entUser.Locked,
-		APIKey:       entUser.APIKey,
-		MFAEnabled:   entUser.MfaEnabled,
-		MFASecret:    entUser.MfaSecret,
-		Invited:      entUser.Invited,
-		CreatedAt:    entUser.CreatedAt,
-		UpdatedAt:    entUser.UpdatedAt,
-		Role:         entUser.Role,
+		ID:                           entUser.ID,
+		Email:                        entUser.Email,
+		PasswordHash:                 entUser.PasswordHash,
+		Locked:                       entUser.Locked,
+		APIKey:                       entUser.APIKey,
+		MFAEnabled:                   entUser.MfaEnabled,
+		MFASecret:                    entUser.MfaSecret,
+		Invited:                      entUser.Invited,
+		CreatedAt:                    entUser.CreatedAt,
+		UpdatedAt:                    entUser.UpdatedAt,
+		Role:                         entUser.Role,
+		PasswordResetToken:           entUser.PasswordResetToken,
+		PasswordResetTokenExpiration: entUser.PasswordResetTokenExpiration,
 	}
 	if u.Locked {
 		u.LockedAt = &entUser.LockedAt
@@ -79,17 +81,20 @@ func (s *Storage) UserGetByID(ctx context.Context, id uuid.UUID) (*models.User, 
 }
 
 type UpdateUserOptions struct {
-	PasswordHash   *string
-	Locked         *bool
-	APIKey         *string
-	MFAEnabled     *bool
-	MFASecret      *string
-	LastLogin      *time.Time
-	LockedAt       *time.Time
-	Invited        *bool
-	ClearLastLogin bool
-	ClearLockedAt  bool
-	Role           *string
+	PasswordHash                      *string
+	Locked                            *bool
+	APIKey                            *string
+	MFAEnabled                        *bool
+	MFASecret                         *string
+	LastLogin                         *time.Time
+	LockedAt                          *time.Time
+	Invited                           *bool
+	ClearLastLogin                    bool
+	ClearLockedAt                     bool
+	Role                              *string
+	PasswordResetToken                *string
+	PasswordResetTokenExpiration      *time.Time
+	ClearPasswordResetTokenExpiration bool
 }
 
 func (s *Storage) UserUpdate(ctx context.Context, id uuid.UUID, opts UpdateUserOptions) (*models.User, error) {
@@ -126,6 +131,15 @@ func (s *Storage) UserUpdate(ctx context.Context, id uuid.UUID, opts UpdateUserO
 	}
 	if opts.Role != nil {
 		update = update.SetRole(*opts.Role)
+	}
+	if opts.PasswordResetToken != nil {
+		update = update.SetPasswordResetToken(*opts.PasswordResetToken)
+	}
+	if opts.PasswordResetTokenExpiration != nil {
+		update = update.SetPasswordResetTokenExpiration(*opts.PasswordResetTokenExpiration)
+	}
+	if opts.ClearPasswordResetTokenExpiration {
+		update = update.ClearPasswordResetTokenExpiration()
 	}
 	entUser, err := update.Save(ctx)
 	if err != nil {

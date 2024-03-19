@@ -3,7 +3,10 @@ package core
 import (
 	"context"
 	"errors"
+	"fmt"
+	"github.com/google/uuid"
 	"github.com/pquerna/otp/totp"
+	"go-monolith-template/mailer"
 	"go-monolith-template/pkg/logging"
 	"go-monolith-template/pkg/models"
 	"go-monolith-template/pkg/password_handling"
@@ -15,6 +18,8 @@ import (
 
 type UserService struct {
 	dbConn                 *store.Storage
+	emailService           mailer.Emailer
+	serverURL              string
 	lockoutTracker         map[string]int
 	lockoutThreshold       int
 	minPasswordLen         int
@@ -25,6 +30,8 @@ type UserService struct {
 
 type UserServiceOptions struct {
 	StorageLayer             *store.Storage
+	EmailService             mailer.Emailer
+	ServerURL                string
 	LockoutThreshold         int
 	ComplexPasswordsRequired bool
 	MinPasswordLength        int
@@ -35,6 +42,8 @@ type UserServiceOptions struct {
 func NewUserService(opts UserServiceOptions) *UserService {
 	return &UserService{
 		dbConn:                 opts.StorageLayer,
+		emailService:           opts.EmailService,
+		serverURL:              opts.ServerURL,
 		lockoutTracker:         make(map[string]int),
 		lockoutThreshold:       opts.LockoutThreshold,
 		minPasswordLen:         opts.MinPasswordLength,
@@ -42,6 +51,119 @@ func NewUserService(opts UserServiceOptions) *UserService {
 		mfaMandatory:           opts.MFAMandatory,
 		lockoutDurationMinutes: opts.LockoutDurationMinutes,
 	}
+}
+
+func (u *UserService) SetPasswordViaResetToken(ctx context.Context, email string, token string, newPassword string) error {
+	email = strings.TrimSpace(strings.ToLower(email))
+	user, err := u.dbConn.UserGetByEmail(ctx, email)
+	if err != nil {
+		logging.FromContext(ctx).Warn("failed to locate user", "email", email)
+		return errors.New("User not found")
+	}
+	if user.PasswordResetToken != token {
+		logging.FromContext(ctx).Warn("invalid password reset token", "email", email)
+		return errors.New("Invalid password reset token")
+	}
+	if user.PasswordResetTokenExpiration.Before(time.Now()) {
+		logging.FromContext(ctx).Warn("expired password reset token", "email", email)
+		return errors.New("Expired password reset token")
+	}
+	if !password_handling.IsPasswordValid(newPassword, u.minPasswordLen, u.complexPasswords) {
+		return errors.New("Invalid password")
+	}
+	hash := password_handling.HashAndSaltPassword(newPassword)
+	empty := ""
+	_, err = u.dbConn.UserUpdate(ctx, user.ID, store.UpdateUserOptions{
+		PasswordHash:                      &hash,
+		PasswordResetToken:                &empty,
+		ClearPasswordResetTokenExpiration: true,
+	})
+	if err != nil {
+		logging.FromContext(ctx).Error("failed to update password", "email", email, "error", err)
+		return errors.New("Failed to update password")
+	}
+	return nil
+}
+
+func (u *UserService) RequestPasswordReset(ctx context.Context, email string) {
+	email = strings.TrimSpace(strings.ToLower(email))
+	user, err := u.dbConn.UserGetByEmail(ctx, email)
+	if err != nil {
+		logging.FromContext(ctx).Warn("failed to locate user", "email", email)
+		return
+	}
+	token := uuid.New().String()
+	exp := time.Now().Add(time.Hour * 24)
+	_, err = u.dbConn.UserUpdate(ctx, user.ID, store.UpdateUserOptions{
+		PasswordResetToken:           &token,
+		PasswordResetTokenExpiration: &exp,
+	})
+	if err != nil {
+		logging.FromContext(ctx).Error("failed to update password reset token", "email", email, "error", err)
+		return
+	}
+	err = u.emailService.SendEmail(ctx, mailer.SendEmailInput{
+		To:               user.Email,
+		Subject:          "Reset your Go-Mono-Template password",
+		CC:               "",
+		BCC:              "",
+		Title:            "Reset your Go-Mono-Template password",
+		PoweredByLink:    u.serverURL,
+		PoweredByText:    "Go Monolith Template",
+		ContentHeader:    "Reset Password",
+		ContentText:      "Click the button below to reset your password",
+		CallToActionLink: fmt.Sprintf("%s/reset_password?token=%s&email=%s", u.serverURL, token, user.Email),
+		CallToActionText: "Reset Password",
+		UnsubscribeLink:  u.serverURL + "/unsubscribe",
+	})
+	if err != nil {
+		logging.FromContext(ctx).Error("failed to send password reset email", "email", email, "error", err)
+	}
+}
+
+func (u *UserService) DeleteUser(ctx context.Context, email string) error {
+	email = strings.TrimSpace(strings.ToLower(email))
+	user, err := u.dbConn.UserGetByEmail(ctx, email)
+	if err != nil {
+		logging.FromContext(ctx).Warn("failed to locate user", "email", email)
+		return errors.New("User not found")
+	}
+	err = u.dbConn.UserDelete(ctx, user.ID)
+	if err != nil {
+		logging.FromContext(ctx).Error("failed to delete user", "email", email, "error", err)
+		return errors.New("Failed to delete user")
+	}
+	return nil
+}
+
+func (u *UserService) SetUserPassword(ctx context.Context, email string, newPassword string) error {
+	email = strings.TrimSpace(strings.ToLower(email))
+	user, err := u.dbConn.UserGetByEmail(ctx, email)
+	if err != nil {
+		logging.FromContext(ctx).Warn("failed to locate user", "email", email)
+		return errors.New("User not found")
+	}
+	if !password_handling.IsPasswordValid(newPassword, u.minPasswordLen, u.complexPasswords) {
+		return errors.New("Invalid password - does not meet complexity requirements")
+	}
+	hash := password_handling.HashAndSaltPassword(newPassword)
+	_, err = u.dbConn.UserUpdate(ctx, user.ID, store.UpdateUserOptions{
+		PasswordHash: &hash,
+	})
+	if err != nil {
+		logging.FromContext(ctx).Error("failed to update password", "email", email, "error", err)
+		return errors.New("Failed to update password")
+	}
+	return nil
+}
+
+func (u *UserService) GetUserByID(ctx context.Context, id uuid.UUID) (*models.User, error) {
+	user, err := u.dbConn.UserGetByID(ctx, id)
+	if err != nil {
+		logging.FromContext(ctx).Warn("failed to locate user", "id", id)
+		return nil, errors.New("User not found")
+	}
+	return user, nil
 }
 
 // AuthenticateUser authenticates a user based on their email and password, all errors returned are frontend friendly
@@ -76,8 +198,10 @@ func (u *UserService) AuthenticateUser(ctx context.Context, email string, passwo
 			return true, true, nil
 		}
 		now := time.Now()
+		f := false
 		_, err = u.dbConn.UserUpdate(ctx, user.ID, store.UpdateUserOptions{
 			LastLogin: &now,
+			Invited:   &f, // Remove invited flag because the user has now logged in
 		})
 		if err != nil {
 			logging.FromContext(ctx).Error("failed to update last login", "email", email, "error", err)
@@ -268,10 +392,20 @@ func (u *UserService) CreateUser(ctx context.Context, email string, role string,
 		Email:        email,
 		PasswordHash: hash,
 		Role:         role,
+		Invited:      true,
 	})
 	if err != nil {
 		logging.FromContext(ctx).Error("failed to create user", "email", email, "error", err)
 		return nil, errors.New("Failed to create user")
 	}
 	return user, nil
+}
+
+func (u *UserService) UpdateUser(ctx context.Context, id uuid.UUID, options store.UpdateUserOptions) error {
+	_, err := u.dbConn.UserUpdate(ctx, id, options)
+	if err != nil {
+		logging.FromContext(ctx).Error("failed to update user", "id", id, "error", err)
+		return errors.New("Failed to update user")
+	}
+	return nil
 }

@@ -188,6 +188,46 @@ func (uu *UserUpdate) SetNillableRole(s *string) *UserUpdate {
 	return uu
 }
 
+// SetPasswordResetTokenExpiration sets the "password_reset_token_expiration" field.
+func (uu *UserUpdate) SetPasswordResetTokenExpiration(t time.Time) *UserUpdate {
+	uu.mutation.SetPasswordResetTokenExpiration(t)
+	return uu
+}
+
+// SetNillablePasswordResetTokenExpiration sets the "password_reset_token_expiration" field if the given value is not nil.
+func (uu *UserUpdate) SetNillablePasswordResetTokenExpiration(t *time.Time) *UserUpdate {
+	if t != nil {
+		uu.SetPasswordResetTokenExpiration(*t)
+	}
+	return uu
+}
+
+// ClearPasswordResetTokenExpiration clears the value of the "password_reset_token_expiration" field.
+func (uu *UserUpdate) ClearPasswordResetTokenExpiration() *UserUpdate {
+	uu.mutation.ClearPasswordResetTokenExpiration()
+	return uu
+}
+
+// SetPasswordResetToken sets the "password_reset_token" field.
+func (uu *UserUpdate) SetPasswordResetToken(s string) *UserUpdate {
+	uu.mutation.SetPasswordResetToken(s)
+	return uu
+}
+
+// SetNillablePasswordResetToken sets the "password_reset_token" field if the given value is not nil.
+func (uu *UserUpdate) SetNillablePasswordResetToken(s *string) *UserUpdate {
+	if s != nil {
+		uu.SetPasswordResetToken(*s)
+	}
+	return uu
+}
+
+// ClearPasswordResetToken clears the value of the "password_reset_token" field.
+func (uu *UserUpdate) ClearPasswordResetToken() *UserUpdate {
+	uu.mutation.ClearPasswordResetToken()
+	return uu
+}
+
 // AddUserSessionIDs adds the "user_session" edge to the Session entity by IDs.
 func (uu *UserUpdate) AddUserSessionIDs(ids ...uuid.UUID) *UserUpdate {
 	uu.mutation.AddUserSessionIDs(ids...)
@@ -312,6 +352,18 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := uu.mutation.Role(); ok {
 		_spec.SetField(user.FieldRole, field.TypeString, value)
+	}
+	if value, ok := uu.mutation.PasswordResetTokenExpiration(); ok {
+		_spec.SetField(user.FieldPasswordResetTokenExpiration, field.TypeTime, value)
+	}
+	if uu.mutation.PasswordResetTokenExpirationCleared() {
+		_spec.ClearField(user.FieldPasswordResetTokenExpiration, field.TypeTime)
+	}
+	if value, ok := uu.mutation.PasswordResetToken(); ok {
+		_spec.SetField(user.FieldPasswordResetToken, field.TypeString, value)
+	}
+	if uu.mutation.PasswordResetTokenCleared() {
+		_spec.ClearField(user.FieldPasswordResetToken, field.TypeString)
 	}
 	if uu.mutation.UserSessionCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -536,6 +588,46 @@ func (uuo *UserUpdateOne) SetNillableRole(s *string) *UserUpdateOne {
 	return uuo
 }
 
+// SetPasswordResetTokenExpiration sets the "password_reset_token_expiration" field.
+func (uuo *UserUpdateOne) SetPasswordResetTokenExpiration(t time.Time) *UserUpdateOne {
+	uuo.mutation.SetPasswordResetTokenExpiration(t)
+	return uuo
+}
+
+// SetNillablePasswordResetTokenExpiration sets the "password_reset_token_expiration" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillablePasswordResetTokenExpiration(t *time.Time) *UserUpdateOne {
+	if t != nil {
+		uuo.SetPasswordResetTokenExpiration(*t)
+	}
+	return uuo
+}
+
+// ClearPasswordResetTokenExpiration clears the value of the "password_reset_token_expiration" field.
+func (uuo *UserUpdateOne) ClearPasswordResetTokenExpiration() *UserUpdateOne {
+	uuo.mutation.ClearPasswordResetTokenExpiration()
+	return uuo
+}
+
+// SetPasswordResetToken sets the "password_reset_token" field.
+func (uuo *UserUpdateOne) SetPasswordResetToken(s string) *UserUpdateOne {
+	uuo.mutation.SetPasswordResetToken(s)
+	return uuo
+}
+
+// SetNillablePasswordResetToken sets the "password_reset_token" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillablePasswordResetToken(s *string) *UserUpdateOne {
+	if s != nil {
+		uuo.SetPasswordResetToken(*s)
+	}
+	return uuo
+}
+
+// ClearPasswordResetToken clears the value of the "password_reset_token" field.
+func (uuo *UserUpdateOne) ClearPasswordResetToken() *UserUpdateOne {
+	uuo.mutation.ClearPasswordResetToken()
+	return uuo
+}
+
 // AddUserSessionIDs adds the "user_session" edge to the Session entity by IDs.
 func (uuo *UserUpdateOne) AddUserSessionIDs(ids ...uuid.UUID) *UserUpdateOne {
 	uuo.mutation.AddUserSessionIDs(ids...)
@@ -690,6 +782,18 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	}
 	if value, ok := uuo.mutation.Role(); ok {
 		_spec.SetField(user.FieldRole, field.TypeString, value)
+	}
+	if value, ok := uuo.mutation.PasswordResetTokenExpiration(); ok {
+		_spec.SetField(user.FieldPasswordResetTokenExpiration, field.TypeTime, value)
+	}
+	if uuo.mutation.PasswordResetTokenExpirationCleared() {
+		_spec.ClearField(user.FieldPasswordResetTokenExpiration, field.TypeTime)
+	}
+	if value, ok := uuo.mutation.PasswordResetToken(); ok {
+		_spec.SetField(user.FieldPasswordResetToken, field.TypeString, value)
+	}
+	if uuo.mutation.PasswordResetTokenCleared() {
+		_spec.ClearField(user.FieldPasswordResetToken, field.TypeString)
 	}
 	if uuo.mutation.UserSessionCleared() {
 		edge := &sqlgraph.EdgeSpec{

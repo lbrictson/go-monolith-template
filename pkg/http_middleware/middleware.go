@@ -1,9 +1,11 @@
 package http_middleware
 
 import (
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"go-monolith-template/pkg/logging"
 	"go-monolith-template/pkg/models"
+	"go-monolith-template/pkg/session_handling"
 	"go-monolith-template/pkg/store"
 )
 
@@ -17,6 +19,7 @@ type SessionHandler interface {
 	Destroy(c echo.Context) error
 	GetSessionData(c echo.Context) (models.SessionData, error)
 	Update(c echo.Context, opts store.UpdateSessionOptions) error
+	GetNotifications(id uuid.UUID) []session_handling.Notification
 }
 
 func NewMiddleware(sessionHandler SessionHandler) *Middleware {
@@ -43,6 +46,12 @@ func (m *Middleware) LoginRequired(next echo.HandlerFunc) echo.HandlerFunc {
 		c.Set("auth_method", "frontend")
 		c.Set("request_id", c.Response().Header().Get(echo.HeaderXRequestID))
 		c.Set("ip", c.RealIP())
+		if data.Role == models.ADMIN_ROLE {
+			c.Set("isAdmin", true)
+		} else {
+			c.Set("isAdmin", false)
+		}
+		c.Set("notifications", m.sessionHandler.GetNotifications(data.ID))
 		l := logging.FromEchoContext(c)
 		l = l.With("http_session_id", c.Get("session_id"))
 		l = l.With("http_user_id", c.Get("user_id"))

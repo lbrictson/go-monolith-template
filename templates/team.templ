@@ -3,6 +3,7 @@ package templates
 import (
     "fmt"
     "go-monolith-template/pkg/models"
+    "go-monolith-template/pkg/session_handling"
 )
 
 templ PageAdminTeam(user models.User, isAdmin bool) {
@@ -31,6 +32,8 @@ templ PageAdminTeam(user models.User, isAdmin bool) {
                     <div class="d-grid gap-2">
                     <button type="submit" class="btn btn-secondary">Search</button>
                     </div>
+                    <br/>
+                    <a href="/admin/team">Reset</a>
                 </form>
                 </div>
                 </div>
@@ -53,7 +56,7 @@ templ PageAdminTeam(user models.User, isAdmin bool) {
                 <form hx-post="/component/admin/create_user" hx-trigger="submit" hx-target="#teamtable">
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" name="email" required />
+                        <input type="email" class="form-control" name="email" required />
                     </div>
                     <div class="mb-3">
                         <label for="password" class="form-label">Initial Password</label>
@@ -77,19 +80,7 @@ templ PageAdminTeam(user models.User, isAdmin bool) {
 </div>
 }
 
-templ TeamTable(users []models.User, currentEmail string, pageNumber int, showError bool, errorMessage string, showSuccess bool, successMessage string) {
-    if showError {
-    <div class="alert alert-secondary alert-dismissible" role="alert">
-        <strong>Error: { errorMessage }</strong>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    }
-    if showSuccess {
-    <div class="alert alert-secondary alert-dismissible" role="alert">
-        <strong>{ successMessage }</strong>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    }
+templ TeamTable(users []models.User, currentEmail string, pageNumber int, notifications []session_handling.Notification) {
     <table class="table">
         <thead>
             <tr>
@@ -112,7 +103,7 @@ templ TeamTable(users []models.User, currentEmail string, pageNumber int, showEr
                     Actions
                   </button>
                   <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="#">Reset Password</a></li>
+                    <li><a class="dropdown-item" href={templ.URL(fmt.Sprintf("/admin/team/set_password/%v", user.ID))}>Reset Password</a></li>
                     if user.Role == "Admin" {
                     <li><a class="dropdown-item" href="#">Demote to User</a></li>
                     } else {
@@ -140,4 +131,38 @@ templ TeamTable(users []models.User, currentEmail string, pageNumber int, showEr
               <button type="button" class="btn btn-secondary" hx-target="#teamtable" hx-trigger="click" hx-get={fmt.Sprintf("/component/admin/team_table?page=%v", pageNumber + 1) }>Next</button>
     }
     </div>
+    for _, notification := range notifications {
+        @Notification(notification.Header, notification.Message)
+    }
+}
+
+templ AdminSetPasswordPage(email string, isAdmin bool, targetUser models.User) {
+    @Navbar("admin", email, isAdmin)
+    <div class="container">
+    <div class="row">
+    <div class="col-md-3">
+    </div>
+    <div class="col-md-6">
+        <div class="card shadow-lg">
+        <div class="card-body">
+            <h4 class="text-center" style="text-decoration: underline;">Set Password</h4>
+            <br/>
+            <form method="post" action="/admin/team/set_password">
+                <input type="hidden" name="email" value={targetUser.Email} />
+                <div class="mb-3">
+                    <label for="password" class="form-label">New Password for {targetUser.Email}</label>
+                    <input type="password" class="form-control" name="password" required />
+                </div>
+                <div class="d-grid gap">
+                <button type="submit" class="btn btn-secondary">Set Password</button>
+                </div>
+            </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <a href="/admin/team" class="btn btn-secondary">Back</a>
+    </div>
+</div>
+</div>
 }

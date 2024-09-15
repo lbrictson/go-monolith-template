@@ -23,12 +23,12 @@ implementation, however postgres is fully supported in the configuration file.
 
 ## Required Tools
 
-- [Docker](https://www.docker.com/)
-- [Docker Compose](https://docs.docker.com/compose/)
-- [Make](https://www.gnu.org/software/make/)
-- [Go](https://golang.org/)
-- [Templ](https://templ.guide/quick-start/installation)
-- [Air](https://github.com/cosmtrek/air)
+- <a href="https://www.docker.com/" target="_blank">Docker</a>
+- <a href="https://docs.docker.com/compose/" target="_blank">Docker Compose</a>
+- <a href="https://www.gnu.org/software/make/" target="_blank">Make</a>
+- <a href="https://golang.org/" target="_blank">Go</a>
+- <a href="https://templ.guide/quick-start/installation" target="_blank">Templ</a>
+- <a href="https://github.com/cosmtrek/air" target="_blank">Air</a>
 
 ## Quick Start
 
@@ -58,7 +58,7 @@ or disable automatic runs you can remove the call in `main.go` and run the migra
 
 Templates are located in the `templates` directory and use the `templ` package for rendering.  The `templ` package is a wrapper around the `html/template` package that provides a few extra features.
 
-Feel free to modify as needed, read the docs here: https://templ.guide/
+Feel free to modify as needed, read the docs here: <a href="https://templ.guide/" target="_blank">Templ Guide</a>
 
 ## Repo Structure
 
